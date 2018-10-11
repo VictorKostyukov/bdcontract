@@ -1,0 +1,6 @@
+node_modules
+*.swp
+.vscode
+*.code-workspace
+package-lock.json
+.data

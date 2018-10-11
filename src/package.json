@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "argparse": "^1.0.10",
+    "better-queue": "^3.8.10",
+    "better-queue-sql": "^1.0.3",
+    "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.4",
+    "mkdirp": "^0.5.1",
+    "persistent-cache": "^1.1.1",
+    "shortid": "^2.2.13",
+    "sqlite3": "^4.0.2"
+  }
+}
