@@ -173,7 +173,7 @@ function startWebService(port) {
 
 function main() {
   let args = parseArgs();
-  initTaskQueue(args.queue)
+  initTaskQueue(args.data)
     .then(() => {
       startWebService(args.port);
     })

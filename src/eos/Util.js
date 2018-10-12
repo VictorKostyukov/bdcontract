@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-const config = require("../TaskConfig.js");
+const config = require("./TaskConfig.js");
 
 
 class Util {
@@ -39,11 +39,18 @@ class Util {
 
       child.on("close", (code) => {
         result.code = code;
-        if (resolve) {
-          resolve(result);
-        }
+        resolve(result);
+      });
+
+      child.on("error", (error) => {
+        reject(error);
       });
     });
+  }
+
+
+  static async execEOS(args, cwd, env) {
+    return Util.exec(config.cleos, Util.appendArgs(args), cwd, env);
   }
 
 
@@ -84,19 +91,28 @@ class Util {
   }
 
 
+  static appendArgs(args) {
+    if (!args) {
+      return config.cleos_args;
+    }
+
+    return config.cleos_args.concat(args);
+  }
+
+
   static async unlockWallet() {
-    let result = await Util.exec(config.cleos, [ "wallet", "unlock", "-n", config.wallet, "--password", config.wallet_password ]);
+    let result = await Util.execEOS([ "wallet", "unlock", "-n", config.wallet, "--password", config.wallet_password ]);
     return result.code === 0;
   }
 
 
-  static async tryExecUnlock(name, args, cwd, env) {
-    let result = await Util.exec(name, args, cwd, env);
+  static async execEOSUnlock(args, cwd, env) {
+    let result = await Util.execEOS(args, cwd, env);
     if (result.code !== 0) {
       if (Util.hasWalletLockedError(result)) {
         let unlocked = await Util.unlockWallet();
         if (unlocked) {
-          result = await Util.exec(name, args, cwd, env);
+          result = await Util.execEOS(args, cwd, env);
         }
       }
     }

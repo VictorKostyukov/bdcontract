@@ -5,8 +5,9 @@ const confFile = "../../config/eos.conf";
 class TaskConfig {
   constructor() {
     this._config = {
-      cleos : "cleos",
+      cleos : "docker",
       symbol : "SYS",
+      cleos_args : [ "exec", "eosio", "/opt/eosio/bin/cleos", "--url", "http://127.0.0.1:7777", "--wallet-url", "http://127.0.0.1:5555" ],
       wallet : "default",
       wallet_password : "PW5JnDVPytL3DyHxCp2zVD3dADat7gzYDS2LfRuxaEVdr6JCPrgBj",
       wallet_account : "eosio"
@@ -17,7 +18,6 @@ class TaskConfig {
         this._config = Object.assign({}, this._config, obj);
       })
       .catch(ex => {
-        console.warn("Failed to load eos.conf. Use default configurations.");
       });
   }
 
@@ -49,6 +49,6 @@ class TaskConfig {
 }
 
 
-let config = new TaskConfig().config;
+var config = new TaskConfig().config;
 
 module.exports = config;

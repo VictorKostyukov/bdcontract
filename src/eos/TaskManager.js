@@ -38,7 +38,7 @@ class TaskManager {
 
 
   static async getAndVerifyTask(id) {
-    let task = await getTask(id);
+    let task = await TaskManager.getTask(id);
     if (!task) {
       throw new except.ObjectNotFoundException();
     }

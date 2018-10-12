@@ -1,11 +1,11 @@
 #! /usr/bin/env node
 
 const config = require("../TaskConfig.js");
-const Util = require("../Util.js")
+const Util = require("../Util.js");
 
 
 async function createKey() {
-  let result = await Util.tryExecUnlock(config.cleos, [ "wallet", "create_key", "-n", config.wallet ]);
+  let result = await Util.execEOSUnlock([ "wallet", "create_key", "-n", config.wallet ]);
   if (result.code !== 0) {
     throw result;
   }
@@ -23,7 +23,7 @@ async function run() {
   let pubKey = await createKey();
   let name = Util.createAddress();
   
-  let result = await Util.tryExecUnlock(config.cleos, [ "create", "account", config.wallet_account, name, pubKey ]);
+  let result = await Util.execEOSUnlock([ "create", "account", config.wallet_account, name, pubKey ]);
   if (result.code !== 0) {
     throw result;
   }

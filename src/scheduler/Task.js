@@ -75,6 +75,10 @@ class BashTask extends Task {
           resolve(result);
         }
       });
+
+      child.on("error", (error) => {
+        reject(error);
+      });
     });
   }
 }
