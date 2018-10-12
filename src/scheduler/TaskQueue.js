@@ -2,7 +2,9 @@
 
 const Queue = require("better-queue");
 const Task = require("./Task.js");
-const Cache = require("persistent-cache");
+const cache = require("node-persist");
+
+const defaultTTL = 30 * 60 * 1000;
 
 class TaskQueue {
   constructor(dir) {
@@ -11,7 +13,6 @@ class TaskQueue {
     this._activeCount = 0;
     this._initialized = false;
     this._stopCallback = null;
-    this._cache = null;
   }
 
 
@@ -25,17 +26,20 @@ class TaskQueue {
   }
 
 
-  init() {
+  async init() {
     const mkdirp = require("mkdirp");
     const Path = require("path");
     mkdirp(this._path);
 
-    this._cache = cache({
-      base : this._path,
-      name : "tasks",
-      duration : 3600 * 1000 // one hour
-    });
+    const cacheDir = Path.join(this._path, "tasks.cache");
+    mkdirp(cacheDir);
 
+    await cache.init({
+      dir : cacheDir,
+      ttl : defaultTTL,
+      forgiveParseErrors: true
+    });
+    
     this._queue = new Queue((input, cb) => {
       this.__onProcessTask(input)
         .then(result => {
@@ -64,23 +68,61 @@ class TaskQueue {
     };
 
     this._queue.on("task_finish", (taskId, result, stats) => {
-      this._cache.put(taskId, result);
-      oncomplete();
+      let handler = async () => {
+        try {
+          let task = await cache.getItem(taskId);
+          if (!task) {
+            task = { id : taskId };
+          } else {
+            await cache.removeItem(taskId);
+          }
+
+          task.__status = "success";
+          task.__output = result;
+          await cache.setItem(taskId, task, { ttl : defaultTTL });
+        } catch (ex) {
+          console.error(ex);
+        }
+
+        oncomplete();
+      };
+
+      handler().catch(ex => { console.error(ex); });
     });
 
     this._queue.on("task_failed", (taskId, err, stats) => {
-      this._cache.put(taskId, { Type : "Error", Data : err });
-      oncomplete();
+      let handler = async () => {
+        try {
+          let task = await cache.getItem(taskId);
+          if (!task) {
+            task = { id : taskId };
+          } else {
+            await cache.removeItem(taskId);
+          }
+
+          task.__status = "failed";
+          task.__output = err;
+          await cache.setItem(taskId, task, { ttl : defaultTTL });
+        } catch (ex) {
+          console.error(ex);
+        }
+
+        oncomplete();
+      };
+
+      handler().catch(ex => { console.error(ex); });
     });
 
     this._initialized = true;
   }
 
 
-  add(task, onsuccess, onerror) {
+  async add(task, onsuccess, onerror) {
     if (!task.id) {
       task.id = require("shortid").generate();
     }
+
+    await cache.setItem(task.id, task, { ttl : defaultTTL });
 
     this._queue.push(task)
       .on("finish", (result) => {
@@ -97,9 +139,39 @@ class TaskQueue {
     return task.id;
   }
 
+  
+  async getResult(id) {
+    let task = await cache.getItem(id);
+    if (!task) {
+      return undefined;
+    }
 
-  getResult(id) {
-    return this._cache.getSync(id);
+    if (task.__status) {
+      return {
+        task : task,
+        status : task.__status,
+        output : task.__output
+      };
+    } else {
+      return {
+        task : task,
+        status : "ongoing"
+      };
+    }
+  }
+
+
+  async isComplete(id) {
+    let task = await cache.getItem(id);
+    if (!task) {
+      return undefined;
+    }
+
+    if (task.__status) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
 

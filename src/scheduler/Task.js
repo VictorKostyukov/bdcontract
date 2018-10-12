@@ -49,7 +49,7 @@ class BashTask extends Task {
     }
 
     if (this.definition.env) {
-      options.cwd = Object.assign({}, process.env, this.definition.env);
+      options.env = Object.assign({}, process.env, this.definition.env);
     }
 
     const child = spawn(cmd, args, options);

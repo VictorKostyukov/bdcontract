@@ -39,30 +39,32 @@ function main() {
   process.once("SIGTERM", exitcb);
   process.once("SIGINT", exitcb);
 
-  queue.init();
+  let start  = async () => {
+    await queue.init();
 
-  queue._queue.on("task_finish", (id, result, stats) => {
-    console.log("Complete: " + id);
-    console.log(result.stdout);
-  });
-
-  queue._queue.on("task_failed", (id, err, stats) => {
-    console.log("Failed: " + id);
-    console.log(err);
-  });
-
-  for (let i = 0; i < 3; ++i) {
-    queue.add({
+    let id = await queue.add({
       type : "bash",
       cmd : "ping",
       args : [ "-c", "5", "127.0.0.1" ]
-    }, (result) => {
-//      console.log("Task complete.");
-//      console.log(result.stdout);
     });
-  }
 
-  console.log("All tasks added");
+    let checkStatus = () => {
+      let worker = async () => {
+        let result = await queue.getResult(id);
+        if (result.status === "success" || result.status === "failed") {
+          console.log(result.output);
+        } else {
+          setTimeout(checkStatus, 500);
+        }
+      };
+
+      worker().catch(ex => { console.error(ex); });
+    };
+
+    checkStatus();
+  };
+
+  start().catch(ex => { console.error(ex); });
 }
 
 

@@ -33,7 +33,7 @@ function parseArgs() {
 }
 
 
-function initTaskQueue(file) {
+async function initTaskQueue(file) {
   const path = require("path");
   if (!path.isAbsolute(file)) {
     file = path.join(__dirname, file);
@@ -51,7 +51,7 @@ function initTaskQueue(file) {
   process.once("SIGTERM", exitcb);
   process.once("SIGINT", exitcb);
 
-  g_taskQueue.init();
+  return await g_taskQueue.init();
 }
 
 
@@ -173,8 +173,13 @@ function startWebService(port) {
 
 function main() {
   let args = parseArgs();
-  initTaskQueue(args.queue);
-  startWebService(args.port);
+  initTaskQueue(args.queue)
+    .then(() => {
+      startWebService(args.port);
+    })
+    .catch(ex => {
+      console.error(ex);
+    });
 }
 
 
