@@ -12,7 +12,7 @@ class TaskManager {
     let argsArr = [];
 
     const path = require("path");
-    argsArr.push(path.join(__dirname, "..", "tasks", `${name}.js`));
+    argsArr.push(path.join(__dirname, "tasks", `${name}.js`));
 
     if (args) {
       for (let key in args) {
@@ -25,7 +25,7 @@ class TaskManager {
       type : "bash",
       cmd : "node",
       args : argsArr,
-      cwd : path.join(__dirname, "../tasks")
+      cwd : path.join(__dirname, "tasks")
     };
 
     return await g_taskQueue.add(definition);
@@ -50,6 +50,25 @@ class TaskManager {
     }
 
     return task;
+  }
+
+
+  static async createTask(name, args) {
+    let taskId = await TaskManager.addTask(name, args);
+    return {
+      Type : "Task",
+      Id : taskId
+    };
+  }
+
+
+  static async getTaskResult(id) {
+    let task = await TaskManager.getAndVerifyTask(id);
+    if (task.output.code !== 0) {
+      throw new except.TaskFailureException(JSON.parse(task.output.stderr));
+    }
+
+    return JSON.parse(task.output.stdout);
   }
 }
 

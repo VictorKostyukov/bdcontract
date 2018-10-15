@@ -9,17 +9,42 @@ class AccountApi {
 
 
   async NewAccount() {
-    let taskId = await TaskManager.addTask("create_account");
-    return {
-      Type : "Task",
-      Id : taskId
-    };
+    return TaskManager.createTask("create_account");
   }
 
 
-  async GetNewAccountResult(id) {
-    let task = await TaskManager.getAndVerifyTask(id);
-    return JSON.parse(task.output);
+  async NewAccountResult(id) {
+    return TaskManager.getTaskResult(id);
+  }
+
+
+  async GetBalance(account) {
+    return TaskManager.createTask("get_balance", { account: account });
+  }
+
+
+  async GetBalanceResult(id) {
+    return TaskManager.getTaskResult(id);
+  }
+
+
+  async IssueTokens(account, amount) {
+    return TaskManager.createTask("issue_tokens", { account: account, amount: amount });
+  }
+
+
+  async IssueTokensResult(id) {
+    return TaskManager.getTaskResult(id);
+  }
+
+
+  async TransferTokens(from, to, amount) {
+    return TaskManager.createTask("transfer_tokens", { from: from, to: to, amount: amount });
+  }
+
+
+  async TransferTokensResult(id) {
+    return TaskManager.getTaskResult(id);
   }
 }
 

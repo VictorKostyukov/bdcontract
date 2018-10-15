@@ -10,7 +10,10 @@ class TaskConfig {
       cleos_args : [ "exec", "eosio", "/opt/eosio/bin/cleos", "--url", "http://127.0.0.1:7777", "--wallet-url", "http://127.0.0.1:5555" ],
       wallet : "default",
       wallet_password : "PW5JnDVPytL3DyHxCp2zVD3dADat7gzYDS2LfRuxaEVdr6JCPrgBj",
-      wallet_account : "eosio"
+      wallet_account : "eosio",
+      token_contract : "eosio.token",
+      action_issue: "issue",
+      action_transfer: "transfer"
     };
 
     TaskConfig.loadConfig()
