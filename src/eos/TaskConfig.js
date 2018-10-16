@@ -7,6 +7,7 @@ class TaskConfig {
     this._config = {
       cleos : "docker",
       symbol : "SYS",
+      symbol_precision : 4,
       cleos_args : [ "exec", "eosio", "/opt/eosio/bin/cleos", "--url", "http://127.0.0.1:7777", "--wallet-url", "http://127.0.0.1:5555" ],
       wallet : "default",
       wallet_password : "PW5JnDVPytL3DyHxCp2zVD3dADat7gzYDS2LfRuxaEVdr6JCPrgBj",

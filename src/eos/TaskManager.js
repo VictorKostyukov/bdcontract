@@ -1,6 +1,7 @@
 #! /usr/bin/env node
 
 const except = require("./Exception.js");
+const Util = require("./Util.js");
 
 
 class TaskManager {
@@ -37,7 +38,7 @@ class TaskManager {
   }
 
 
-  static async getAndVerifyTask(id) {
+  static async getAndVerifyTask(id, checkEOS) {
     let task = await TaskManager.getTask(id);
     if (!task) {
       throw new except.ObjectNotFoundException();
@@ -47,6 +48,14 @@ class TaskManager {
       throw new except.TaskFailureException(task.output);
     } else if (task.status !== "success") {
       throw new except.TaskNotCompleteException();
+    }
+
+    if (checkEOS && task.output) {
+      let code = Util.getError(task.output);
+      if (code !== null) {
+        let msg = task.output.stderr && task.output.stderr !== "" ? task.output.stderr : task.output.stdout;
+        throw new except.EOSErrorException(code, msg);
+      }
     }
 
     return task;
@@ -62,8 +71,8 @@ class TaskManager {
   }
 
 
-  static async getTaskResult(id) {
-    let task = await TaskManager.getAndVerifyTask(id);
+  static async getTaskResult(id, checkEOS) {
+    let task = await TaskManager.getAndVerifyTask(id, checkEOS);
     if (task.output.code !== 0) {
       throw new except.TaskFailureException(JSON.parse(task.output.stderr));
     }

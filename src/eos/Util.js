@@ -119,6 +119,15 @@ class Util {
 
     return result;
   }
+
+
+  static parseArg(arg) {
+    try {
+      return JSON.parse(arg);
+    } catch (ex) {
+      return arg;
+    }
+  }
 }
 
 

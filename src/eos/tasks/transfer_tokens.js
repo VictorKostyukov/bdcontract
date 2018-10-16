@@ -60,7 +60,7 @@ async function transferTokens(from, to, amount, memo, authorization) {
     "action",
     config.token_contract,
     config.action_transfer,
-    JSON.stringify([ from, to, `${amount} ${config.symbol}`, memo]),
+    JSON.stringify([ from, to, `${amount.toFixed(config.symbol_precision)} ${config.symbol}`, memo]),
     "-p",
     `${authorization}@active`
   ]);
@@ -77,10 +77,15 @@ async function run() {
   let args = parseArgs();
   let authorization = args.authorization;
   if (authorization === "") {
-    authorization = from;
+    authorization = args.from;
   }
 
-  return await transferTokens(args.from, args.to, args.amount, args.memo, authorization);
+  return await transferTokens(
+    Util.parseArg(args.from),
+    Util.parseArg(args.to),
+    args.amount,
+    Util.parseArg(args.memo),
+    Util.parseArg(authorization));
 }
 
 

@@ -45,7 +45,7 @@ async function issueTokens(account, amount, memo) {
     "action",
     config.token_contract,
     config.action_issue,
-    JSON.stringify([ account, `${amount} ${config.symbol}`, memo ]),
+    JSON.stringify([ account, `${amount.toFixed(config.symbol_precision)} ${config.symbol}`, memo ]),
     "-p",
     `${config.wallet_account}@active`
   ]);
@@ -60,7 +60,11 @@ async function issueTokens(account, amount, memo) {
 
 async function run() {
   let args = parseArgs();
-  return await issueTokens(args.account, args.amount, args.memo);
+
+  return await issueTokens(
+    Util.parseArg(args.account),
+    args.amount,
+    Util.parseArg(args.memo));
 }
 
 

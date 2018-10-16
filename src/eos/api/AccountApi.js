@@ -1,7 +1,6 @@
 #! /usr/bin/env node
 
 const TaskManager = require("../TaskManager.js");
-const except = require("../Exception.js");
 
 class AccountApi {
   constructor(request, response) {
@@ -13,18 +12,8 @@ class AccountApi {
   }
 
 
-  async NewAccountResult(id) {
-    return TaskManager.getTaskResult(id);
-  }
-
-
   async GetBalance(account) {
     return TaskManager.createTask("get_balance", { account: account });
-  }
-
-
-  async GetBalanceResult(id) {
-    return TaskManager.getTaskResult(id);
   }
 
 
@@ -33,18 +22,8 @@ class AccountApi {
   }
 
 
-  async IssueTokensResult(id) {
-    return TaskManager.getTaskResult(id);
-  }
-
-
   async TransferTokens(from, to, amount) {
     return TaskManager.createTask("transfer_tokens", { from: from, to: to, amount: amount });
-  }
-
-
-  async TransferTokensResult(id) {
-    return TaskManager.getTaskResult(id);
   }
 }
 

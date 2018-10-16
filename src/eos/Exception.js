@@ -15,6 +15,7 @@ const ERR_INVALID_CREDENTIAL = 203;
 const ERR_REQUIRE_PASSWORD = 301;
 const ERR_TASK_NOT_COMPLETE = 401;
 const ERR_TASK_FAILURE = 402;
+const ERR_EOS_ERROR = 501;
 
 
 const formatMessage = function(prefix, message) {
@@ -155,6 +156,18 @@ class TaskFailureException extends Exception {
 }
 
 
+class EOSErrorException extends Exception {
+  constructor(code, msg) {
+    super(formatMessage("EOS error", msg), ERR_EOS_ERROR);
+    this._eosCode = code;
+  }
+
+  get eosCode() {
+    return this._eosCode;
+  }
+}
+
+
 module.exports = {
   Exception : Exception,
   InvalidArgumentException : InvalidArgumentException,
@@ -170,5 +183,6 @@ module.exports = {
   InvalidCredentialException : InvalidCredentialException,
   RequirePasswordException : RequirePasswordException,
   TaskNotCompleteException : TaskNotCompleteException,
-  TaskFailureException : TaskFailureException
+  TaskFailureException : TaskFailureException,
+  EOSErrorException : EOSErrorException
 };

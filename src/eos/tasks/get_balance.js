@@ -39,7 +39,7 @@ async function getBalance(account) {
 
 async function run() {
   let args = parseArgs();
-  return await getBalance(args.account);
+  return await getBalance(Util.parseArg(args.account));
 }
 
 
