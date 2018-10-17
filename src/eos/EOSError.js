@@ -1,0 +1,12 @@
+#! /usr/bin/env node
+
+const EOSError = {
+  ACCOUNT_ALREADY_EXIST : 3050001,
+  ACCESS_DENIED : 3090003,
+  WALLET_ALREADY_EXIST : 3120001,
+  WALLET_NOT_FOUND : 3120002,
+  WALLET_LOCKED : 3120003
+};
+
+
+module.exports = EOSError;

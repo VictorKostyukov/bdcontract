@@ -24,7 +24,7 @@ function parseArgs() {
 
 
 async function getBalance(account) {
-  let result = await Util.execEOSUnlock([ "get", "currency", "balance", config.token_contract, account, config.symbol ]);
+  let result = await Util.execEOS([ "get", "currency", "balance", config.token_contract, account, config.symbol ]);
   if (result.code !== 0) {
     throw result;
   }
@@ -46,9 +46,6 @@ async function run() {
 run().then(balance => {
   console.log(JSON.stringify(balance));
 }).catch(ex => {
-  console.error(JSON.stringify({
-    Type : "Error",
-    Data : ex
-  }));
+  console.error(Util.toErrorJSON(ex));
   process.exit(1);
 });

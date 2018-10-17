@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 const config = require("./TaskConfig.js");
-
+const EOSError = require("./EOSError.js");
 
 class Util {
   constructor() {
@@ -87,7 +87,7 @@ class Util {
 
   static hasWalletLockedError(result) {
     let error = Util.getError(result);
-    return error === 3120003;
+    return error === EOSError.WALLET_LOCKED || error === EOSError.ACCESS_DENIED;
   }
 
 
@@ -100,17 +100,23 @@ class Util {
   }
 
 
-  static async unlockWallet() {
-    let result = await Util.execEOS([ "wallet", "unlock", "-n", config.wallet, "--password", config.wallet_password ]);
+  static async unlockWallet(account, password) {
+    // TODO: put the password in temporary file and delete after usage instead of passing it through bash
+    let result = await Util.execEOS([ "wallet", "open", "-n", account]);
+    if (result.code !== 0) {
+      return false;
+    }
+
+    result = await Util.execEOS([ "wallet", "unlock", "-n", account, "--password", password ]);
     return result.code === 0;
   }
 
 
-  static async execEOSUnlock(args, cwd, env) {
+  static async execEOSUnlock(args, account, password, cwd, env) {
     let result = await Util.execEOS(args, cwd, env);
     if (result.code !== 0) {
       if (Util.hasWalletLockedError(result)) {
-        let unlocked = await Util.unlockWallet();
+        let unlocked = await Util.unlockWallet(account, password);
         if (unlocked) {
           result = await Util.execEOS(args, cwd, env);
         }
@@ -127,6 +133,22 @@ class Util {
     } catch (ex) {
       return arg;
     }
+  }
+
+
+  static toErrorJSON(result) {
+    let rtn = {
+      Type : "Error",
+      Data : result
+    };
+
+    let code = Util.getError(result);
+    if (code !== null) {
+      rtn.Provider = "EOS";
+      rtn.Code = code;
+    }
+
+    return rtn;
   }
 }
 

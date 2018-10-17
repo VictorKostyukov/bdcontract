@@ -48,7 +48,7 @@ async function issueTokens(account, amount, memo) {
     JSON.stringify([ account, `${amount.toFixed(config.symbol_precision)} ${config.symbol}`, memo ]),
     "-p",
     `${config.wallet_account}@active`
-  ]);
+  ], config.wallet, config.wallet_password);
 
   if (result.code !== 0) {
     throw result;
@@ -71,10 +71,7 @@ async function run() {
 run().then(rtn => {
   console.log(JSON.stringify(rtn));
 }).catch(ex => {
-  console.error(JSON.stringify({
-    Type : "Error",
-    Data : ex
-  }));
+  console.error(Util.toErrorJSON(ex));
   process.exit(1);
 });
 

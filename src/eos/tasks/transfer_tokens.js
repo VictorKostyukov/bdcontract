@@ -43,9 +43,9 @@ function parseArgs() {
   );
 
   parser.addArgument(
-    [ "--authorization" ],
+    [ "--password" ],
     {
-      help: "Authorized by account",
+      help: "Account password",
       defaultValue: ""
     }
   );
@@ -54,7 +54,7 @@ function parseArgs() {
 }
 
 
-async function transferTokens(from, to, amount, memo, authorization) {
+async function transferTokens(from, to, amount, memo, password) {
   let result = await Util.execEOSUnlock([
     "push",
     "action",
@@ -62,8 +62,8 @@ async function transferTokens(from, to, amount, memo, authorization) {
     config.action_transfer,
     JSON.stringify([ from, to, `${amount.toFixed(config.symbol_precision)} ${config.symbol}`, memo]),
     "-p",
-    `${authorization}@active`
-  ]);
+    `${from}@active`
+  ], from, password);
 
   if (result.code !== 0) {
     throw result;
@@ -75,27 +75,20 @@ async function transferTokens(from, to, amount, memo, authorization) {
 
 async function run() {
   let args = parseArgs();
-  let authorization = args.authorization;
-  if (authorization === "") {
-    authorization = args.from;
-  }
 
   return await transferTokens(
     Util.parseArg(args.from),
     Util.parseArg(args.to),
     args.amount,
     Util.parseArg(args.memo),
-    Util.parseArg(authorization));
+    Util.parseArg(args.password));
 }
 
 
 run().then(rtn => {
   console.log(JSON.stringify(rtn));
 }).catch(ex => {
-  console.error(JSON.stringify({
-    Type : "Error",
-    Data : ex
-  }));
+  console.error(Util.toErrorJSON(ex));
   process.exit(1);
 });
 
