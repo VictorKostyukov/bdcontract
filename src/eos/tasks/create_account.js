@@ -91,7 +91,7 @@ async function run() {
   return {
     name : name,
     password : password,
-    owner : ownerKeyPair.publicKey
+    owner : ownerKeyPair.privateKey
   };
 }
 
