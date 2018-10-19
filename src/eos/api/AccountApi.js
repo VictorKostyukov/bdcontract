@@ -35,7 +35,7 @@ class AccountApi {
   }
 
 
-  async TransferTokens(from, to, amount) {
+  async TransferTokens(from, to, amount, password) {
     if (!from || from === "") {
       throw new except.InvalidArgumentException("from");
     }
@@ -46,7 +46,7 @@ class AccountApi {
       throw new except.InvalidArgumentException("amount");
     }
 
-    return TaskManager.createTask("transfer_tokens", { from: from, to: to, amount: amount });
+    return TaskManager.createTask("transfer_tokens", { from: from, to: to, amount: amount, password : password });
   }
 }
 
