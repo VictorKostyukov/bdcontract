@@ -48,6 +48,19 @@ class AccountApi {
 
     return TaskManager.createTask("transfer_tokens", { from: from, to: to, amount: amount, password : password });
   }
+
+
+  async GetTransferHistory(account, pos, limit) {
+    if (!account) {
+      throw new except.InvalidArgumentException("account");
+    }
+
+    if (pos < -1) {
+      throw new except.InvalidArgumentException("pos");
+    }
+
+    return TaskManager.createTask("get_transfer_history", { account : account, pos : pos, limit : limit });
+  }
 }
 
 

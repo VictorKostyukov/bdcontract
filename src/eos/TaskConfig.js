@@ -14,7 +14,8 @@ class TaskConfig {
       wallet_account : "eosio",
       token_contract : "eosio.token",
       action_issue: "issue",
-      action_transfer: "transfer"
+      action_transfer: "transfer",
+      min_action_history : 3
     };
 
     TaskConfig.loadConfig()
