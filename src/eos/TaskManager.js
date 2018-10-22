@@ -74,6 +74,18 @@ class TaskManager {
   static async getTaskResult(id, checkEOS) {
     let task = await TaskManager.getAndVerifyTask(id, checkEOS);
     if (task.output.code !== 0) {
+      if (checkEOS) {
+        let error = null;
+        try {
+          error = JSON.parse(task.output.stderr);
+        } catch (ex) {
+        }
+
+        if (error && error.Type === "Error" && error.Provider === "EOS") {
+          let msg = error.Data.stderr && error.Data.stderr !== "" ? error.Data.stderr : error.Data.stdout;
+          throw new except.EOSErrorException(error.Code, msg);
+        }
+      }
       throw new except.TaskFailureException(JSON.parse(task.output.stderr));
     }
 

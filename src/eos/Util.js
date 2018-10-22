@@ -74,7 +74,7 @@ class Util {
         continue;
       }
 
-      let line = input[i].split("\n", 1)[0];
+      let line = input[i].trim().split("\n", 1)[0];
       let match = line.match(/Error \d+:/g);
       if (match && match.length > 0) {
         return parseInt(match[0].substr("Error ".length, match[0].length - "Error ".length - 1));
@@ -148,7 +148,7 @@ class Util {
       rtn.Code = code;
     }
 
-    return rtn;
+    return JSON.stringify(rtn);
   }
 }
 
