@@ -120,7 +120,7 @@ async function getHistory(account, pos, limit) {
 
 async function run() {
   let args = parseArgs();
-  return await getHistory(args.account, args.pos, args.limit);
+  return await getHistory(Util.parseArg(args.account), args.pos, args.limit);
 }
 
 
